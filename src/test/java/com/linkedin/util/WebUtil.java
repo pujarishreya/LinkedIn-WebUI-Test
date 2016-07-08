@@ -55,7 +55,6 @@ public class WebUtil {
         //Wait till the element is visible.
         WebDriverWait wait = new WebDriverWait(driver, WAIT_TIME_OUT_IN_SECONDS);
         wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-
     }
 
     public static void waitForPageRefresh() {

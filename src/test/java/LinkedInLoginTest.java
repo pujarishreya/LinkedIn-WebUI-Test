@@ -10,10 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 
@@ -23,8 +20,7 @@ public class LinkedInLoginTest {
 
 
     @Test
-    public void linkedinSignInShouldBeSuccessful() throws InterruptedException {
-
+    public void linkedinSignInShouldBeSuccessful() {
         //1. Goto LinkedIn website (https://www.linkedin.com/)
         LoginPage loginPage = WebUtil.goToLoginPage(driver);
 
@@ -130,7 +126,7 @@ public class LinkedInLoginTest {
         MessagesPage messagesPage = HomePage.clickOnMessagesTab(driver, By.cssSelector("#account-nav > ul > li:nth-child(1) > a"));
         WebUtil.waitForPageRefresh();
 
-        //3. Click on 'Compose button'.
+        //3. Click on 'Compose button'.send
         messagesPage.clickOnCompose(driver, By.cssSelector("#compose-button"));
 
         //4. Add name/ select from connections for sending the message.
@@ -154,6 +150,59 @@ public class LinkedInLoginTest {
         assertEquals("Validation FAILED - Text \" " + messageBody + "\" NOT FOUND", true, messageBodyPart.getText().contains(messageBody));
 
         //8. Logout of the session.
+        homePage.signOut(driver);
+    }
+
+    @Test
+    public void leavePageBeforeSaving() {
+        //1. Sign In to the account.
+        //Goto LinkedIn website (https://www.linkedin.com/)
+        LoginPage loginPage = WebUtil.goToLoginPage(driver);
+        //Enter login details.
+        loginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
+        loginPage.enterPassword(driver, "123*****");
+        //Click on Sign In.
+        HomePage homePage = LoginPage.clickSignIn(driver);
+
+        //2. Click on Messages tab.
+        MessagesPage messagesPage = HomePage.clickOnMessagesTab(driver, By.cssSelector("#account-nav > ul > li:nth-child(1) > a"));
+        WebUtil.waitForPageRefresh();
+
+        //3. Click on 'Compose button'.send
+        messagesPage.clickOnCompose(driver, By.cssSelector("#compose-button"));
+
+        //4. Add name/ select from connections for sending the message.
+        messagesPage.addNameToSendMessage(driver.findElement(By.cssSelector("#pillbox-input")), "Shreya Pujari");
+        //Wait for few seconds for the display of existing connections name.
+        WebUtil.waitForPageRefresh();
+        //Select 'Enter keyboard input method'.
+        driver.findElement(By.cssSelector("#pillbox-input")).sendKeys(Keys.RETURN);
+
+        //5. Add message body.
+        final String messageBody = "This is a test message. Navigate from current page before sending the message";
+        messagesPage.addMessageText(driver.findElement(By.cssSelector("#compose-message")), messageBody);
+        WebUtil.waitForPageRefresh();
+
+        //6. Click on Home tab for the message box to appear.
+        WebUtil.click(driver, By.cssSelector("#header-navigation-main > ul > li:nth-child(1) > a"));
+        WebUtil.waitForPageRefresh();
+
+        //7. Verify that the Alert window is displayed.
+        //Get a handle to the open alert
+        final String alertText = "you want to leave";
+        Alert alert = driver.switchTo().alert();
+        assertEquals("Validation FAILED - Text \" " + alertText + "\" NOT FOUND", true, alert.getText().contains(alertText));
+        //WebUtil.waitForPageRefresh();
+
+        //8. Click on 'Leave Page'.
+        try {
+            alert.accept();
+            WebUtil.waitForPageRefresh();
+        } catch (Exception e) {
+            //Nothing happens when there is no alert.
+        }
+
+        //9. Logout of the session.
         homePage.signOut(driver);
     }
 

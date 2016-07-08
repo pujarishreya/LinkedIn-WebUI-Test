@@ -18,7 +18,7 @@ public class HomePage {
 
     public LoginPage signOut(WebDriver driver) {
         //Click on User Icon.
-        WebUtil.click(driver, By.cssSelector("#header-navigation-utilities > ul > li.activity-tab.account-settings-tab > a"));
+        WebUtil.click(driver, By.cssSelector("#account-nav > ul > li.nav-item.account-settings-tab > a > img"));
         //Wait till the page gets refreshed.
         WebUtil.waitForElementsToBeVisible(driver, By.cssSelector("#account-sub-nav > div > div.account-sub-nav-body > ul > li.self > div > span > span.act-set-action > a"));
         //Find the Sign Out button and click on it.
