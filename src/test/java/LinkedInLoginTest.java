@@ -2,20 +2,19 @@
  * Created by shreya on 3/7/16.
  */
 
-import com.linkedin.pageobjects.HomePage;
-import com.linkedin.pageobjects.LoginPage;
-import com.linkedin.pageobjects.ProfilePage;
+import com.linkedin.pageobjects.*;
 import com.linkedin.util.WebUtil;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 public class LinkedInLoginTest {
@@ -33,26 +32,24 @@ public class LinkedInLoginTest {
         //Below command fails if the String "Forgot password?" is not found.
         assertTrue("Validation FAILED - Text \"Forgot password?\" NOT FOUND", loginPage.doesResponseContains(driver, "Forgot password?"));
 
-        //3. Enter email and password.
-        //Enter email.
-        LoginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
-        //Enter the password.
+        //3. Enter login details.
+        loginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
         loginPage.enterPassword(driver, "123*****");
 
         //4. Click on Sign In.
         HomePage homePage = LoginPage.clickSignIn(driver);
 
         //5. Verify that the Sign In was successful.
-        assertTrue("Validation FAILED - Text \"Home\" NOT FOUND", homePage.doesHomeTabExist(driver));
+        assertTrue("Validation FAILED - Text \"Home\" NOT FOUND", WebUtil.doesElementExist(driver, By.cssSelector("#main-site-nav > ul > li:nth-child(1) > a")));
 
         //6. LogOut of the account.
-        loginPage = homePage.signOut(driver);
+        homePage.signOut(driver);
 
         //7. Verify that the Logout was successful.
         //wait for the visibility of "Sign In" button before verifying for successful logout.
-        WebDriverWait wait = new WebDriverWait(driver, 5);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#top-header > div > ul > li:nth-child(3) > a")));
-        assertTrue("Validation FAILED - Text \"Sign Out was not successful\"", LoginPage.doesResponseContains(driver, "You have signed out"));
+        WebUtil.waitForElementsToBeVisible(driver, By.cssSelector("#top-header > div > ul > li:nth-child(3) > a"));
+
+        assertTrue("Validation FAILED - Text \"Sign Out was not successful\"", loginPage.doesResponseContains(driver, "You have signed out"));
     }
 
     @Test
@@ -60,35 +57,104 @@ public class LinkedInLoginTest {
         //1. Sign In to the account.
         //Goto LinkedIn website (https://www.linkedin.com/)
         LoginPage loginPage = WebUtil.goToLoginPage(driver);
-        //Enter email.
-        LoginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
-        //Enter the password.
+        //Enter login details.
+        loginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
         loginPage.enterPassword(driver, "123*****");
         //Click on Sign In.
         HomePage homePage = LoginPage.clickSignIn(driver);
 
         //2. Click on the profile tab.
-        ProfilePage profilePage = HomePage.clickProfileTab(driver);
+        ProfilePage profilePage = homePage.clickProfileTab(driver);
 
-        //3. Update the location of most recent experience.
+        //3. Click on the Location field.
         profilePage.clickLocationField(driver);
 
-        //4. Save the changes.
-        profilePage.saveChanges(driver);
+        //4. Update the location to 'California'.
+        profilePage.enterLocation(driver, "California");
 
-        //5. Verify that the profile update is reflected on the profile page.
-        assertTrue("Validation FAILED - Text \"California location\" NOT FOUND", ProfilePage.doesResponseConatins(driver, "California"));
+        //5. Save the changes.
+        profilePage.clickOnSave(driver);
 
-        //Wait for the page to get refreshed before logout is attempted.
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //6. Verify that the profile update is reflected on the profile page.
+        assertTrue("Validation FAILED - Text \"California location\" NOT FOUND", ProfilePage.doesResponseContains(driver, "California"));
 
-        //6. Log out of the session.
+        //7. Log out of the session.
         homePage.signOut(driver);
+    }
 
+
+    @Test
+    public void addNewConnection() {
+        //1. Sign In to the account.
+        //Goto LinkedIn website (https://www.linkedin.com/)
+        LoginPage loginPage = WebUtil.goToLoginPage(driver);
+        //Enter login details.
+        loginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
+        loginPage.enterPassword(driver, "123*****");
+        //Click on Sign In.
+        HomePage homePage = LoginPage.clickSignIn(driver);
+
+        //2. Add new connection by sending an invite.
+        AddConnectionPage addConnectionPage = AddConnectionPage.clickAddConnection(driver,  By.cssSelector("#network-sub-nav > li:nth-child(2) > a"));
+
+        //3. Click on 'Invite by Email' icon.
+        addConnectionPage.clickOnInvite(driver, By.cssSelector("#email-origin-container > li:nth-child(6) > button"));
+        WebUtil.waitForPageRefresh();
+
+        //4. Type in the email address that you want to send the invite to.
+        addConnectionPage.enterEmailToSendInvite(driver.findElement((By.cssSelector("#invitation-list"))), "shreya.ppujari@gmail.com");
+
+        //5. Click on Submit.
+        addConnectionPage.clickOnSubmit(driver, By.cssSelector("#abook-import-form-compose-invite > fieldset > div > input"));
+        WebUtil.waitForPageRefresh();
+
+        //6. Verify that the invitation was sent to the recipient.
+        assertTrue("Validation FAILED - Text \"Your invitation has been sent. Manage your invitations.\" NOT FOUND", WebUtil.doesElementExist(driver, By.cssSelector("#global-alert-queue > div.alert.success.animate-in")));
+
+        //7. Log out of the session.
+        homePage.signOut(driver);
+    }
+
+    @Test
+    public void sendMessageToConnection() {
+        //1. Sign In to the account.
+        //Goto LinkedIn website (https://www.linkedin.com/)
+        LoginPage loginPage = WebUtil.goToLoginPage(driver);
+        //Enter login details.
+        loginPage.enterEmail(driver, "testlinkedinwebsite@gmail.com");
+        loginPage.enterPassword(driver, "123*****");
+        //Click on Sign In.
+        HomePage homePage = LoginPage.clickSignIn(driver);
+
+        //2. Click on Messages tab.
+        MessagesPage messagesPage = HomePage.clickOnMessagesTab(driver, By.cssSelector("#account-nav > ul > li:nth-child(1) > a"));
+        WebUtil.waitForPageRefresh();
+
+        //3. Click on 'Compose button'.
+        messagesPage.clickOnCompose(driver, By.cssSelector("#compose-button"));
+
+        //4. Add name/ select from connections for sending the message.
+        messagesPage.addNameToSendMessage(driver.findElement(By.cssSelector("#pillbox-input")), "Shreya Pujari");
+        //Wait for few seconds for the display of existing connections name.
+        WebUtil.waitForPageRefresh();
+        //Select 'Enter keyboard input method'.
+        driver.findElement(By.cssSelector("#pillbox-input")).sendKeys(Keys.RETURN);
+
+        //5. Add message body.
+        final String messageBody = "This is a test message.";
+        messagesPage.addMessageText(driver.findElement(By.cssSelector("#compose-message")), messageBody);
+        WebUtil.waitForPageRefresh();
+
+        //6. Send the message by sending the key 'Enter'.
+        messagesPage.clickOnSend(driver, By.cssSelector("#compose-region > div > form > div.compose-action-bar > div.right-actions > div.send-bar > button"));
+        WebUtil.waitForPageRefresh();
+
+        //7. Verify that the message is sent.
+        WebElement messageBodyPart = driver.findElement(By.cssSelector("#messages-list-wrapper > ul > li > div.selectable-area > div.message-info > div.other-info > div > h4 > p"));
+        assertEquals("Validation FAILED - Text \" " + messageBody + "\" NOT FOUND", true, messageBodyPart.getText().contains(messageBody));
+
+        //8. Logout of the session.
+        homePage.signOut(driver);
     }
 
     @After
