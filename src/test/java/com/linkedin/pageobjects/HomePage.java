@@ -22,7 +22,6 @@ public class HomePage {
         //Click on User Icon.
         WebUtil.click(driver, By.cssSelector("#account-nav > ul > li.nav-item.account-settings-tab > a > img"));
         //Wait till the page gets refreshed.
-        //WebUtil.waitForMilliSeconds();
         WebUtil.waitForElementsToBeVisible(driver, By.cssSelector("#account-sub-nav > div > div.account-sub-nav-body > ul > li.self > div > span > span.act-set-action > a"));
         //Find the Sign Out button and click on it.
         WebUtil.click(driver, By.cssSelector("#account-sub-nav > div > div.account-sub-nav-body > ul > li.self > div > span > span.act-set-action > a"));
