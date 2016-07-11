@@ -8,6 +8,7 @@ import com.linkedin.categories.Medium;
 import com.linkedin.pageobjects.*;
 import com.linkedin.util.WebUtil;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,12 +16,26 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 
 public class LinkedInLoginTest {
 
-    WebDriver driver = new FirefoxDriver(); // Creation of WebDriver
+    //Creation of WebDriver such that it is available for all @Test and @After.
+    WebDriver driver;
+
+    @Before
+    public void setBrowser() {
+        //Get the System Env browser. This variable will give the information about available web-browser.
+        String browser = System.getenv("browser");
+        if ((browser == null) && (browser.equalsIgnoreCase("Chrome"))){
+            System.setProperty("webdriver.chrome.driver", "/home/shreya/WebDrivers/chromedriver");
+            driver = new ChromeDriver();
+        } else {
+            driver = new FirefoxDriver();
+        }
+    }
 
     @Category({High.class})
     @Test
