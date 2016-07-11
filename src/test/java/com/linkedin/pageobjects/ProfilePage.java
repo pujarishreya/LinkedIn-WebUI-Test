@@ -26,11 +26,7 @@ public class ProfilePage {
         //Scroll down by 750 pixel for the visibility of Save Button.
         ((JavascriptExecutor) driver).executeScript("scroll(0,750)");
         //Wait for the page to get refreshed.
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        WebUtil.waitForMilliSeconds();
     }
 
     public ProfilePage clickOnSave(WebDriver driver) {

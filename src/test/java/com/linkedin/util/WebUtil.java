@@ -13,7 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class WebUtil {
     private static final long WAIT_TIME_OUT_IN_SECONDS = 10;
-    private static final long SLEEP_TIMEOUT_IN_MILLISECONDS = 3000;
+    private static final long SLEEP_TIMEOUT_IN_MILLISECONDS = 5000;
 
     public static LoginPage goToLoginPage(WebDriver driver) {
         driver.get("https://www.linkedin.com"); // Opening LinkedIn Website
@@ -57,7 +57,7 @@ public class WebUtil {
         wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
-    public static void waitForPageRefresh() {
+    public static void waitForMilliSeconds() {
         //Wait for the page to get refreshed and for the actions to be synchronized.
         try {
             Thread.sleep(SLEEP_TIMEOUT_IN_MILLISECONDS);

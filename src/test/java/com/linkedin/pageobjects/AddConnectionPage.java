@@ -32,5 +32,6 @@ public class AddConnectionPage {
     public void clickOnSubmit(WebDriver driver, By by) {
         //Click on Submit button to send the invite.
         WebUtil.click(driver, by);
+        WebUtil.waitForMilliSeconds();
     }
 }
