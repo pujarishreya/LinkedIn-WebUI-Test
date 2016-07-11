@@ -1,5 +1,6 @@
+package com.linkedin.tests;
 /**
- * Created by shreya on 3/7/16.
+ * Created by shreya on 4/14/16.
  */
 
 import com.linkedin.categories.High;
@@ -10,31 +11,42 @@ import com.linkedin.util.WebUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.experimental.categories.Category;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 
+public class SeleniumGridLinkedInLoginTest {
 
-public class LinkedInLoginTest {
-
-    //Creation of WebDriver such that it is available for all @Test and @After.
-    WebDriver driver;
+    //Creation of Remote WebDriver such that it is available for all @Test, @Before and @After.
+    RemoteWebDriver driver;
 
     @Before
-    public void setBrowser() {
+    public void setBrowser() throws MalformedURLException {
         //Get the System Env browser. This variable will give the information about available web-browser.
         String browser = System.getenv("browser");
+
+        //Setting Desired Capabilities.
+        DesiredCapabilities desiredCapabilities;
+
         if ((browser == null) && (browser.equalsIgnoreCase("Chrome"))){
             System.setProperty("webdriver.chrome.driver", "/home/shreya/WebDrivers/chromedriver");
-            driver = new ChromeDriver();
+            desiredCapabilities = DesiredCapabilities.chrome();
         } else {
-            driver = new FirefoxDriver();
+            desiredCapabilities = DesiredCapabilities.firefox();
         }
+
+        //Setting new RemoteWebDriver with Desired Capabilities.
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), desiredCapabilities);
     }
 
     @Category({High.class})
